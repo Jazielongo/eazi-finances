@@ -1,6 +1,503 @@
-{% extends 'base.html' %} 
-{% block title %}Inicio - Eazi Finances{% endblock %}
-{% block content %}
-    {% include 'partials/hero-cards.html' %}
-    {% include 'partials/carousel.html' %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eazi Finances</title>
+
+  <!-- Bulma -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+
+  <!-- CSS local -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Pacifico&display=swap"
+    rel="stylesheet" />
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <!-- JS local -->
+  <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='img/eaziLogo500.png') }}" type="image/png" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#inicio">
+        <img src="{{ url_for('static', filename='img/eaziLogo.png') }}" alt="eazi Logo" class="header-logo" />
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item nav-link" href="#informacion">INFORMACIÓN</a>
+        <a class="navbar-item nav-link" href="#galeria">GALERÍA</a>
+        <a class="navbar-item nav-link" href="#nosotros">NOSOTROS</a>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="user-menu-container">
+            <div class="user-icon" id="userIcon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+              <div class="dropdown-item">Iniciar Sesión</div>
+              <div class="dropdown-item">Crear Cuenta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="inicio" class="section main-content">
+    <div class="container">
+      <div class="columns is-vcentered">
+        <div class="column">
+          <div class="text-section">
+            <h1 class="title welcome-title">
+              <span class="title-line">¡HOLA,</span>
+              <span class="title-line">BIENVENIDO!</span>
+            </h1>
+            <p class="subtitle description">
+              Controlar tus finanzas nunca<br />
+              había sido tan <span class="eazi-text">eazi.</span>
+            </p>
+            <button class="button start-button">Empezar</button>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="logo-graphic">
+            <img src="{{ url_for('static', filename='img/sombraLogo.png') }}" alt="Logo Shadow" class="logo-shadow" />
+            <img src="{{ url_for('static', filename='img/logoPrincipal.png') }}" alt="eazi Finances Logo"
+              class="logo-image" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de características -->
+  <section id="informacion" class="section features-section">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <div class="feature-card">
+            <img src="{{ url_for('static', filename='img/somostext.png') }}" alt="Somos" class="feature-image" />
+            <div class="feature-icon">
+              <img src="{{ url_for('static', filename='img/somos.png') }}" alt="Somos" class="icon-image" />
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="feature-card">
+            <img src="{{ url_for('static', filename='img/queremostext.png') }}" alt="Queremos" class="feature-image" />
+            <div class="feature-icon">
+              <img src="{{ url_for('static', filename='img/queremos.png') }}" alt="Queremos" class="icon-image" />
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="feature-card">
+            <img src="{{ url_for('static', filename='img/pensamostext.png') }}" alt="Pensamos" class="feature-image" />
+            <div class="feature-icon">
+              <img src="{{ url_for('static', filename='img/pensamos.png') }}" alt="Pensamos" class="icon-image" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Carrusel -->
+  <section id="galeria" class="section functions-section">
+    <div class="container">
+      <div class="functions-header">
+        <h2 class="functions-title">EXPLORA NUESTRAS FUNCIONES</h2>
+      </div>
+
+      <div class="carousel-text" id="carouselText">Análisis Inteligente de Tickets</div>
+
+      <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" data-text="Análisis Inteligente de Tickets">
+            <div class="card-content">
+              <h3>Análisis IA</h3>
+              <p>Procesa automáticamente tus tickets con inteligencia artificial</p>
+            </div>
+          </div>
+          <div class="swiper-slide" data-text="Reportes Automatizados">
+            <div class="card-content">
+              <h3>Reportes</h3>
+              <p>Genera reportes detallados de forma automática</p>
+            </div>
+          </div>
+          <div class="swiper-slide" data-text="Dashboard Interactivo">
+            <div class="card-content">
+              <h3>Dashboard</h3>
+              <p>Visualiza tus datos en tiempo real</p>
+            </div>
+          </div>
+          <div class="swiper-slide" data-text="Integración Completa">
+            <div class="card-content">
+              <h3>Integración</h3>
+              <p>Conecta con todas tus herramientas</p>
+            </div>
+          </div>
+          <div class="swiper-slide" data-text="Soporte 24/7">
+            <div class="card-content">
+              <h3>Soporte</h3>
+              <p>Asistencia técnica siempre disponible</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (contenido reducido para brevedad) -->
+  <footer id="nosotros" class="footer">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <h3 class="footer-title">DevTeam</h3>
+          <ul class="footer-list">
+            <li class="footer-item" data-modal="devteam">Ver equipo</li>
+          </ul>
+        </div>
+        <div class="column">
+          <h3 class="footer-title">Nuestra meta</h3>
+          <ul class="footer-list">
+            <li class="footer-item" data-modal="mision">Misión</li>
+            <li class="footer-item" data-modal="vision">Visión</li>
+          </ul>
+        </div>
+        <div class="column">
+          <h3 class="footer-title">Podemos ayudarte</h3>
+          <ul class="footer-list">
+            <li class="footer-item" data-modal="faq">Preguntas frecuentes</li>
+            <li class="footer-item" data-modal="contact">Envíanos un correo</li>
+          </ul>
+        </div>
+        <div class="column">
+          <h3 class="footer-title">Síguenos</h3>
+          <ul class="footer-list">
+            <li class="footer-item" data-modal="facebook">Facebook</li>
+            <li class="footer-item" data-modal="instagram">Instagram</li>
+            <li class="footer-item" data-modal="tiktok">TikTok</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modales -->
+  <!-- Modal DevTeam -->
+  <div id="devteamModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Nuestro Equipo de Desarrollo</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="member-photo">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h3>Jaziel Ambriz</h3>
+          <p class="member-role">Project Manager</p>
+          <p class="member-bio">Líder de proyecto con experiencia en metodologías ágiles y coordinación de equipos de
+            desarrollo.</p>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h3>Madeline Quintana</h3>
+          <p class="member-role">Diseñadora UX/UI</p>
+          <p class="member-bio">Creativa especializada en diseño de interfaces y experiencia de usuario, enfocada en
+            soluciones intuitivas.</p>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h3>Enrique J. Díaz</h3>
+          <p class="member-role">Desarrollador Backend</p>
+          <p class="member-bio">Experto en arquitectura de servidores y bases de datos, con enfoque en seguridad y
+            rendimiento.</p>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <h3>Jesús E. Goñi</h3>
+          <p class="member-role">Desarrollador Frontend</p>
+          <p class="member-bio">Experto en desarrollo web con experiencia en tecnologías modernas y arquitecturas
+            escalables.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Misión -->
+  <div id="misionModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Nuestra Misión</h2>
+      <div class="mission-content">
+        <p>En Eazi Finances queremos que manejar tu dinero sea fácil y sin estrés. Ayudamos a jóvenes emprendedores a
+          organizar sus finanzas para que puedan enfocarse en soñar en grande y hacer crecer sus proyectos con
+          confianza.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Visión -->
+  <div id="visionModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Nuestra Visión</h2>
+      <div class="vision-content">
+        <p>Soñamos con un mundo donde cada joven emprendedor tenga las herramientas y la seguridad para transformar sus
+          ideas en negocios increíbles, disfrutando el camino y celebrando cada logro.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal FAQ -->
+  <div id="faqModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Preguntas Frecuentes</h2>
+      <div class="faq-content">
+        <p>Esta sección estará disponible próximamente con las preguntas más frecuentes de nuestros usuarios.</p>
+        <p>Mientras tanto, puedes contactarnos directamente a través del formulario de contacto.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Contacto -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Contáctanos</h2>
+      <div class="contact-content">
+        <p>¿Tienes alguna pregunta o necesitas ayuda? Estamos aquí para asistirte.</p>
+        <div class="contact-form">
+          <form>
+            <div class="form-group">
+              <label for="contactName">Nombre:</label>
+              <input type="text" id="contactName" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Correo electrónico:</label>
+              <input type="email" id="contactEmail" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="contactMessage">Mensaje:</label>
+              <textarea id="contactMessage" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Enviar Mensaje</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Redes Sociales -->
+  <div id="facebookModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Facebook</h2>
+      <div class="social-content">
+        <p>Síguenos en Facebook para estar al día con nuestras últimas actualizaciones y noticias.</p>
+        <p>Próximamente: Enlace directo a nuestra página de Facebook.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="instagramModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Instagram</h2>
+      <div class="social-content">
+        <p>Síguenos en Instagram para contenido visual y tips financieros.</p>
+        <p>Próximamente: Enlace directo a nuestro perfil de Instagram.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tiktokModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>TikTok</h2>
+      <div class="social-content">
+        <p>Síguenos en TikTok para contenido educativo y entretenido sobre finanzas.</p>
+        <p>Próximamente: Enlace directo a nuestro perfil de TikTok.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+  // Script para modales del footer
+  document.addEventListener('DOMContentLoaded', function () {
+    // Esperar un poco para asegurar que todo esté cargado
+    setTimeout(function () {
+      // Buscar elementos del footer
+      const footerItems = document.querySelectorAll('.footer-item');
+      const modals = document.querySelectorAll('.modal');
+
+      // Agregar event listeners a cada elemento del footer
+      footerItems.forEach(function (item) {
+        item.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const modalId = item.getAttribute('data-modal');
+
+          if (modalId) {
+            const modal = document.getElementById(modalId + 'Modal');
+
+            if (modal) {
+              modal.style.display = 'block';
+              document.body.style.overflow = 'hidden';
+            }
+          }
+        });
+      });
+
+      // Agregar event listeners para cerrar modales
+      const closeButtons = document.querySelectorAll('.close');
+
+      closeButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          const modal = button.closest('.modal');
+          if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+          }
+        });
+      });
+
+      // Cerrar modales al hacer click fuera
+      modals.forEach(function (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+          }
+        });
+      });
+
+      // Cerrar con tecla Escape
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          modals.forEach(function (modal) {
+            if (modal.style.display === 'block') {
+              modal.style.display = 'none';
+              document.body.style.overflow = 'auto';
+            }
+          });
+        }
+      });
+
+    }, 500);
+  });
+</script>
+
+  <!-- Modal Auth (Login / Registro) -->
+  <div id="authModal" class="modal" aria-hidden="true">
+    <div class="modal-content auth-content" role="dialog" aria-labelledby="authTitle" aria-modal="true">
+      <span class="close" aria-label="Cerrar">&times;</span>
+      <h2 id="authTitle">Iniciar sesión</h2>
+
+      <!-- Login -->
+      <form id="loginForm" class="auth-view" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Correo electrónico</label>
+          <input type="email" id="loginEmail" name="email" required placeholder="tucorreo@ejemplo.com" />
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Contraseña</label>
+          <input type="password" id="loginPassword" name="password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="submit-btn">Continuar</button>
+
+        <div class="auth-switch">
+          <span>¿No tienes cuenta?</span>
+          <button type="button" id="toRegister" class="link-like">Crear cuenta</button>
+        </div>
+      </form>
+
+      <!-- Registro -->
+      <form id="registerForm" class="auth-view" autocomplete="off" novalidate style="display:none;">
+        <div class="form-group">
+          <label for="regName">Nombre</label>
+          <input type="text" id="regName" name="name" required placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Correo electrónico</label>
+          <input type="email" id="regEmail" name="email" required placeholder="tucorreo@ejemplo.com" />
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Contraseña</label>
+          <input type="password" id="regPassword" name="password" required placeholder="Crea una contraseña" />
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Teléfono</label>
+          <input type="tel" id="regPhone" name="phone" placeholder="10 dígitos" />
+        </div>
+        <button type="submit" class="submit-btn">Crear cuenta</button>
+
+        <div class="auth-switch">
+          <span>¿Ya tienes cuenta?</span>
+          <button type="button" id="toLogin" class="link-like">Iniciar sesión</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>
