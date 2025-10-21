@@ -1,9 +1,37 @@
-<nav>
-    <a href="/">Eazi</a>
-    <ul>
-        <li><a href="#info">Información</a></li>
-        <li><a href="#galeria">Galería</a></li>
-        <li><a href="#nosotros">Nosotros</a></li>
-        <li><a href="#nosotros">GitHub</a></li>
-    </ul>
-</nav>
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="{{ url_for('static', filename='img/eaziLogo.png') }}" alt="eazi Logo" class="header-logo" />
+            </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item nav-link" href="#informacion">INFORMACIÓN</a>
+                <a class="navbar-item nav-link" href="#galeria">GALERÍA</a>
+                <a class="navbar-item nav-link" href="#nosotros">NOSOTROS</a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="user-menu-container">
+                        <div class="user-icon" id="userIcon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F851D"
+                                stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-item">Mi Perfil</div>
+                            <div class="dropdown-item">Configuración</div>
+                            <div class="dropdown-item logout-item" id="logoutBtn">Cerrar Sesión</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>

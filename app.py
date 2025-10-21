@@ -36,7 +36,7 @@ def realizar_registro():
     if 'usuario_id' not in session:
         return redirect('/')
     # Por ahora redirigir al dashboard hasta que se cree el HTML
-    return redirect('/dashboard')
+    return render_template('registro.html')
 
 @app.route('/reportes')
 def reportes():
