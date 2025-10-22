@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realizar Registro - Eazi Finances</title>
+
+  <!-- Bulma -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+
+  <!-- CSS local -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registro-style.css') }}" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Pacifico&display=swap"
+    rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='img/eaziLogo500.png') }}" type="image/png" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="{{ url_for('static', filename='img/eaziLogo.png') }}" alt="eazi Logo" class="header-logo" />
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbarMenu" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item nav-link" href="#informacion">INFORMACIÓN</a>
+        <a class="navbar-item nav-link" href="#galeria">GALERÍA</a>
+        <a class="navbar-item nav-link" href="#nosotros">NOSOTROS</a>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="user-menu-container">
+            <div class="user-icon" id="userIcon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F851D" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+              <div class="dropdown-item">Mi Perfil</div>
+              <div class="dropdown-item">Configuración</div>
+              <div class="dropdown-item logout-item" id="logoutBtn">Cerrar Sesión</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <section class="registro-section">
+    <div class="container">
+      <!-- Page Title -->
+      <div class="page-title-container">
+        <div class="title-header">
+          <button class="back-to-dashboard-btn" id="backToDashboard">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Volver
+          </button>
+          <h1 class="page-title">REALIZAR REGISTRO</h1>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <div class="registro-form-container">
+        <!-- Tipo de Movimiento -->
+        <div class="form-section">
+          <label class="form-label">Tipo de movimiento:</label>
+          <div class="movement-type-buttons">
+            <button type="button" class="movement-btn active" data-type="ingreso">
+              Ingreso
+            </button>
+            <button type="button" class="movement-btn" data-type="egreso">
+              Egreso
+            </button>
+          </div>
+        </div>
+
+        <!-- Financial Details Block -->
+        <div class="financial-details-block">
+          <div class="financial-grid">
+            <!-- Monto Total -->
+            <div class="financial-item">
+              <label class="financial-label">Monto total:</label>
+              <div class="amount-input-container">
+                <input type="number" id="montoTotal" class="amount-input" placeholder="0.00" min="0" step="0.01">
+                <div class="currency-dropdown" id="currencyDropdown">
+                  <span class="currency-text" id="currencyText">MXN</span>
+                  <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <!-- Currency Dropdown Menu -->
+                  <div class="currency-dropdown-menu" id="currencyDropdownMenu">
+                    <div class="currency-option" data-currency="MXN">MXN - Peso Mexicano</div>
+                    <div class="currency-option" data-currency="USD">USD - Dólar Americano</div>
+                    <div class="currency-option" data-currency="EUR">EUR - Euro</div>
+                    <div class="currency-option" data-currency="CAD">CAD - Dólar Canadiense</div>
+                    <div class="currency-option" data-currency="GBP">GBP - Libra Esterlina</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subtotal -->
+            <div class="financial-item">
+              <label class="financial-label">Subtotal</label>
+              <input type="number" id="subtotal" class="amount-input" placeholder="0.00" min="0" step="0.01">
+            </div>
+
+            <!-- IVA -->
+            <div class="financial-item">
+              <label class="financial-label">IVA</label>
+              <input type="number" id="iva" class="amount-input" placeholder="0.00" min="0" step="0.01">
+            </div>
+
+            <!-- Balance Actual -->
+            <div class="financial-item">
+              <label class="financial-label">Balance actual</label>
+              <div class="balance-display" id="balanceDisplay">$1,000.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Details Block -->
+        <div class="form-details-block">
+          <div class="form-grid">
+            <!-- Form Fields Row 1 -->
+            <div class="form-row">
+              <!-- Descripción de Ingreso -->
+              <div class="form-field">
+                <label class="form-label">Descripcion de ingreso:</label>
+                <input type="text" id="descripcion" class="form-input" placeholder="Texto">
+              </div>
+
+              <!-- Fecha de Registro -->
+              <div class="form-field">
+                <label class="form-label">Fecha de registro:</label>
+                <div class="date-dropdown-container">
+                  <input type="text" id="fechaRegistro" class="form-input date-input" placeholder="DD/MM/AA" readonly>
+                  <div class="date-dropdown" id="dateDropdown">
+                    <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                      <path d="M1 1.5L6 6.5L11 1.5" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <!-- Calendar Dropdown Menu -->
+                    <div class="calendar-dropdown-menu" id="calendarDropdownMenu">
+                      <div class="calendar-header">
+                        <button class="calendar-nav" id="prevMonth">&lt;</button>
+                        <h4 id="calendarMonthYear"></h4>
+                        <button class="calendar-nav" id="nextMonth">&gt;</button>
+                      </div>
+                      <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar days will be generated by JavaScript -->
+                      </div>
+                      <div class="calendar-actions">
+                        <button class="calendar-btn calendar-btn-secondary" id="cancelBtn">Cancelar</button>
+                        <button class="calendar-btn calendar-btn-secondary" id="todayBtn">Hoy</button>
+                        <button class="calendar-btn calendar-btn-primary" id="acceptBtn">Aceptar</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Fields Row 2 -->
+            <div class="form-row">
+              <!-- Categoría -->
+              <div class="form-field">
+                <label class="form-label">Categoria:</label>
+                <div class="dropdown-container" id="categoriaDropdown">
+                  <input type="text" id="categoria" class="form-input dropdown-input" placeholder="Seleccionar categoría" readonly>
+                  <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <!-- Categoría Dropdown Menu -->
+                  <div class="categoria-dropdown-menu" id="categoriaDropdownMenu">
+                    <div class="categoria-option" data-value="ventas">Ventas</div>
+                    <div class="categoria-option" data-value="servicios">Servicios</div>
+                    <div class="categoria-option" data-value="productos">Productos</div>
+                    <div class="categoria-option" data-value="consultoria">Consultoría</div>
+                    <div class="categoria-option" data-value="renta">Renta</div>
+                    <div class="categoria-option" data-value="otros">Otros</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Proveedor -->
+              <div class="form-field">
+                <label class="form-label">Proveedor:</label>
+                <div class="dropdown-container" id="proveedorDropdown">
+                  <input type="text" id="proveedor" class="form-input dropdown-input" placeholder="Seleccionar proveedor" readonly>
+                  <svg class="dropdown-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <!-- Proveedor Dropdown Menu -->
+                  <div class="proveedor-dropdown-menu" id="proveedorDropdownMenu">
+                    <div class="proveedor-option" data-value="cliente-directo">Cliente Directo</div>
+                    <div class="proveedor-option" data-value="amazon">Amazon</div>
+                    <div class="proveedor-option" data-value="mercadolibre">MercadoLibre</div>
+                    <div class="proveedor-option" data-value="facebook-marketplace">Facebook Marketplace</div>
+                    <div class="proveedor-option" data-value="tienda-fisica">Tienda Física</div>
+                    <div class="proveedor-option" data-value="eventos">Eventos</div>
+                    <div class="proveedor-option" data-value="referidos">Referidos</div>
+                    <div class="proveedor-option" data-value="otros">Otros</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista Previa y Botón Guardar -->
+        <div class="preview-save-row">
+          <!-- Vista Previa -->
+          <div class="preview-container">
+            <h3 class="preview-title">Vista Previa</h3>
+            <div class="preview-content">
+              <div class="preview-item">
+                <span class="preview-description">Venta 1 pastel</span>
+                <span class="preview-date">09/10/25</span>
+              </div>
+              <div class="preview-amount">+$550.50</div>
+            </div>
+          </div>
+
+          <!-- Botón Guardar -->
+          <div class="save-button-container">
+            <button type="button" class="save-button" id="guardarBtn">
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hidden Form for Submission -->
+  <form id="registroForm" style="display: none;">
+    <input type="hidden" name="tipo_movimiento" id="hiddenTipoMovimiento" value="ingreso">
+    <input type="hidden" name="monto_total" id="hiddenMontoTotal" value="0.00">
+    <input type="hidden" name="subtotal" id="hiddenSubtotal" value="0.00">
+    <input type="hidden" name="iva" id="hiddenIva" value="0.00">
+    <input type="hidden" name="moneda" id="hiddenMoneda" value="MXN">
+    <input type="hidden" name="descripcion" id="hiddenDescripcion" value="">
+    <input type="hidden" name="fecha_registro" id="hiddenFechaRegistro" value="">
+    <input type="hidden" name="categoria" id="hiddenCategoria" value="">
+    <input type="hidden" name="proveedor" id="hiddenProveedor" value="">
+  </form>
+
+  <!-- JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elementos del DOM
+      const movementBtns = document.querySelectorAll('.movement-btn');
+      const montoTotalInput = document.getElementById('montoTotal');
+      const subtotalInput = document.getElementById('subtotal');
+      const ivaInput = document.getElementById('iva');
+      const descripcionInput = document.getElementById('descripcion');
+      const fechaRegistroInput = document.getElementById('fechaRegistro');
+      const categoriaInput = document.getElementById('categoria');
+      const proveedorInput = document.getElementById('proveedor');
+      const guardarBtn = document.getElementById('guardarBtn');
+      const previewDescription = document.querySelector('.preview-description');
+      const previewDate = document.querySelector('.preview-date');
+      const previewAmount = document.querySelector('.preview-amount');
+      
+      
+      // Elementos del dropdown de moneda
+      const currencyDropdown = document.getElementById('currencyDropdown');
+      const currencyDropdownMenu = document.getElementById('currencyDropdownMenu');
+      const currencyText = document.getElementById('currencyText');
+      const currencyOptions = document.querySelectorAll('.currency-option');
+      
+      // Variables globales
+      let currentCurrency = 'MXN';
+      let currentBalance = 1000.00;
+      
+      // Variables del calendario
+      let currentDate = new Date();
+      let selectedDate = null;
+      let tempSelectedDate = null; // Fecha temporal para el calendario
+      let currentMonth = currentDate.getMonth();
+      let currentYear = currentDate.getFullYear();
+
+      // Inicializar fecha actual
+      const today = new Date();
+      selectedDate = today;
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = String(today.getFullYear()).slice(-2);
+      const formattedDate = `${day}/${month}/${year}`;
+      fechaRegistroInput.value = formattedDate;
+
+      // Toggle movimiento tipo
+      movementBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          movementBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          
+          const tipo = this.dataset.type;
+          document.getElementById('hiddenTipoMovimiento').value = tipo;
+          
+          // Actualizar preview
+          updatePreview();
+        });
+      });
+
+      // Dropdown de moneda
+      currencyDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        currencyDropdownMenu.classList.toggle('show');
+      });
+
+      // Seleccionar moneda
+      currencyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          currentCurrency = this.dataset.currency;
+          currencyText.textContent = currentCurrency;
+          currencyDropdownMenu.classList.remove('show');
+          document.getElementById('hiddenMoneda').value = currentCurrency;
+          
+          // Actualizar preview con nueva moneda
+          updatePreview();
+        });
+      });
+
+      // Cerrar dropdown al hacer click fuera
+      document.addEventListener('click', function() {
+        currencyDropdownMenu.classList.remove('show');
+      });
+
+      // =====================================================
+      // CATEGORÍA DROPDOWN FUNCIONALIDAD
+      // =====================================================
+      const categoriaDropdown = document.getElementById('categoriaDropdown');
+      const categoriaDropdownMenu = document.getElementById('categoriaDropdownMenu');
+      const categoriaOptions = document.querySelectorAll('.categoria-option');
+
+      // Abrir dropdown de categoría
+      categoriaDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        categoriaDropdownMenu.classList.toggle('show');
+      });
+
+      // Seleccionar categoría
+      categoriaOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const selectedValue = this.dataset.value;
+          const selectedText = this.textContent;
+          
+          categoriaInput.value = selectedText;
+          document.getElementById('hiddenCategoria').value = selectedValue;
+          
+          categoriaDropdownMenu.classList.remove('show');
+          updatePreview();
+          
+          console.log('Categoría seleccionada:', selectedText, 'Valor:', selectedValue);
+        });
+      });
+
+      // Cerrar dropdown de categoría al hacer click fuera
+      document.addEventListener('click', function(e) {
+        if (!categoriaDropdown.contains(e.target)) {
+          categoriaDropdownMenu.classList.remove('show');
+        }
+      });
+
+      // =====================================================
+      // PROVEEDOR DROPDOWN FUNCIONALIDAD
+      // =====================================================
+      const proveedorDropdown = document.getElementById('proveedorDropdown');
+      const proveedorDropdownMenu = document.getElementById('proveedorDropdownMenu');
+      const proveedorOptions = document.querySelectorAll('.proveedor-option');
+
+      // Abrir dropdown de proveedor
+      proveedorDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        proveedorDropdownMenu.classList.toggle('show');
+      });
+
+      // Seleccionar proveedor
+      proveedorOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const selectedValue = this.dataset.value;
+          const selectedText = this.textContent;
+          
+          proveedorInput.value = selectedText;
+          document.getElementById('hiddenProveedor').value = selectedValue;
+          
+          proveedorDropdownMenu.classList.remove('show');
+          updatePreview();
+          
+          console.log('Proveedor seleccionado:', selectedText, 'Valor:', selectedValue);
+        });
+      });
+
+      // Cerrar dropdown de proveedor al hacer click fuera
+      document.addEventListener('click', function(e) {
+        if (!proveedorDropdown.contains(e.target)) {
+          proveedorDropdownMenu.classList.remove('show');
+        }
+      });
+
+      // =====================================================
+      // CALENDARIO FUNCIONALIDAD
+      // =====================================================
+      const dateDropdown = document.getElementById('dateDropdown');
+      const calendarDropdownMenu = document.getElementById('calendarDropdownMenu');
+      const calendarMonthYear = document.getElementById('calendarMonthYear');
+      const calendarGrid = document.getElementById('calendarGrid');
+      const prevMonthBtn = document.getElementById('prevMonth');
+      const nextMonthBtn = document.getElementById('nextMonth');
+      const todayBtn = document.getElementById('todayBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const acceptBtn = document.getElementById('acceptBtn');
+
+      // Abrir calendario
+      dateDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+        calendarDropdownMenu.classList.toggle('show');
+        // Resetear fecha temporal al abrir
+        tempSelectedDate = selectedDate;
+        generateCalendar();
+      });
+
+      // Navegación del calendario
+      prevMonthBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
+        generateCalendar();
+      });
+
+      nextMonthBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        generateCalendar();
+      });
+
+      // Botón "Cancelar"
+      cancelBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Cerrar calendario sin guardar cambios
+        calendarDropdownMenu.classList.remove('show');
+        tempSelectedDate = null;
+      });
+
+      // Botón "Hoy"
+      todayBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const today = new Date();
+        tempSelectedDate = today;
+        selectedDate = today;
+        currentMonth = today.getMonth();
+        currentYear = today.getFullYear();
+        generateCalendar();
+        updateDateInput();
+      });
+
+      // Botón "Aceptar"
+      acceptBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (tempSelectedDate) {
+          selectedDate = tempSelectedDate;
+          console.log('Fecha seleccionada:', selectedDate);
+          updateDateInput();
+        }
+        calendarDropdownMenu.classList.remove('show');
+      });
+
+      // Cerrar calendario al hacer click fuera
+      document.addEventListener('click', function(e) {
+        if (!dateDropdown.contains(e.target) && !calendarDropdownMenu.contains(e.target)) {
+          calendarDropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Generar calendario
+      function generateCalendar() {
+        const monthNames = [
+          'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+          'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ];
+
+        calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+        const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        
+        calendarGrid.innerHTML = '';
+
+        // Headers de días
+        days.forEach(day => {
+          const dayHeader = document.createElement('div');
+          dayHeader.className = 'calendar-day-header';
+          dayHeader.textContent = day;
+          calendarGrid.appendChild(dayHeader);
+        });
+
+        // Días del calendario
+        const today = new Date();
+        const currentCalendarDate = new Date(startDate);
+
+        for (let i = 0; i < 42; i++) {
+          const dayElement = document.createElement('button');
+          dayElement.className = 'calendar-day';
+          dayElement.textContent = currentCalendarDate.getDate();
+
+          // Marcar días de otros meses
+          if (currentCalendarDate.getMonth() !== currentMonth) {
+            dayElement.classList.add('other-month');
+          }
+
+          // Marcar día actual
+          if (currentCalendarDate.toDateString() === today.toDateString()) {
+            dayElement.classList.add('today');
+          }
+
+          // Marcar día seleccionado
+          if (tempSelectedDate && currentCalendarDate.toDateString() === tempSelectedDate.toDateString()) {
+            dayElement.classList.add('selected');
+          }
+
+          // Click en día - Capturar la fecha correcta
+          (function(date) {
+            dayElement.addEventListener('click', function(e) {
+              e.stopPropagation();
+              document.querySelectorAll('.calendar-day').forEach(day => day.classList.remove('selected'));
+              this.classList.add('selected');
+              
+              // Crear una nueva fecha para evitar problemas de referencia
+              tempSelectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+              console.log('Día seleccionado:', tempSelectedDate);
+            });
+          })(new Date(currentCalendarDate));
+
+          calendarGrid.appendChild(dayElement);
+          currentCalendarDate.setDate(currentCalendarDate.getDate() + 1);
+        }
+      }
+
+      // Actualizar input de fecha
+      function updateDateInput() {
+        if (selectedDate && fechaRegistroInput) {
+          console.log('selectedDate original:', selectedDate);
+          console.log('selectedDate.getDate():', selectedDate.getDate());
+          console.log('selectedDate.getMonth():', selectedDate.getMonth());
+          console.log('selectedDate.getFullYear():', selectedDate.getFullYear());
+          
+          const day = String(selectedDate.getDate()).padStart(2, '0');
+          const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+          const year = String(selectedDate.getFullYear()).slice(-2);
+          const formattedDate = `${day}/${month}/${year}`;
+          
+          console.log('Fecha formateada:', formattedDate);
+          
+          fechaRegistroInput.value = formattedDate;
+          updatePreview();
+          
+          console.log('Campo actualizado con:', fechaRegistroInput.value);
+        }
+      }
+
+      // Calcular automáticamente subtotal e IVA cuando cambie el monto total
+      montoTotalInput.addEventListener('input', function() {
+        const montoTotal = parseFloat(this.value) || 0;
+        const subtotal = montoTotal / 1.16; // Asumiendo IVA del 16%
+        const iva = montoTotal - subtotal;
+        
+        subtotalInput.value = subtotal.toFixed(2);
+        ivaInput.value = iva.toFixed(2);
+        
+        // Actualizar preview
+        updatePreview();
+      });
+
+      // Actualizar preview cuando cambien los campos
+      [descripcionInput, montoTotalInput, subtotalInput, ivaInput].forEach(input => {
+        input.addEventListener('input', updatePreview);
+      });
+
+      // Actualizar preview
+      function updatePreview() {
+        const descripcion = descripcionInput.value || 'Venta 1 pastel';
+        const fecha = fechaRegistroInput.value || '09/10/25';
+        const monto = parseFloat(montoTotalInput.value) || 0;
+        const tipo = document.querySelector('.movement-btn.active').dataset.type;
+        
+        // Formatear monto con símbolo de moneda
+        const formattedMonto = formatCurrency(monto, currentCurrency);
+        
+        previewDescription.textContent = descripcion;
+        previewDate.textContent = fecha;
+        previewAmount.textContent = (tipo === 'ingreso' ? '+' : '-') + formattedMonto;
+      }
+
+      // Función para formatear números como moneda
+      function formatCurrency(amount, currency = 'MXN') {
+        const currencySymbols = {
+          'MXN': '$',
+          'USD': '$',
+          'EUR': '€',
+          'CAD': 'C$',
+          'GBP': '£'
+        };
+        
+        const symbol = currencySymbols[currency] || '$';
+        return symbol + amount.toFixed(2);
+      }
+
+      // Función para actualizar el balance
+      function updateBalance() {
+        const montoTotal = parseFloat(montoTotalInput.value) || 0;
+        const tipo = document.querySelector('.movement-btn.active').dataset.type;
+        
+        if (tipo === 'ingreso') {
+          currentBalance += montoTotal;
+        } else {
+          currentBalance -= montoTotal;
+        }
+        
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        balanceDisplay.textContent = formatCurrency(currentBalance, currentCurrency);
+      }
+
+      // Guardar registro
+      guardarBtn.addEventListener('click', function() {
+        // Validaciones básicas
+        if (!descripcionInput.value.trim()) {
+          alert('Por favor, ingresa una descripción.');
+          return;
+        }
+
+        if (!montoTotalInput.value || parseFloat(montoTotalInput.value) <= 0) {
+          alert('Por favor, ingresa un monto total válido.');
+          return;
+        }
+
+        // Actualizar campos hidden
+        document.getElementById('hiddenDescripcion').value = descripcionInput.value;
+        document.getElementById('hiddenFechaRegistro').value = fechaRegistroInput.value;
+        document.getElementById('hiddenCategoria').value = categoriaInput.value;
+        document.getElementById('hiddenProveedor').value = proveedorInput.value;
+        document.getElementById('hiddenMontoTotal').value = montoTotalInput.value;
+        document.getElementById('hiddenSubtotal').value = subtotalInput.value;
+        document.getElementById('hiddenIva').value = ivaInput.value;
+        document.getElementById('hiddenMoneda').value = currentCurrency;
+
+        // Actualizar balance
+        updateBalance();
+
+        // Aquí se enviaría el formulario al backend
+        console.log('Guardando registro...');
+        console.log('Datos:', {
+          tipo: document.getElementById('hiddenTipoMovimiento').value,
+          monto: montoTotalInput.value,
+          moneda: currentCurrency,
+          descripcion: descripcionInput.value
+        });
+        
+        alert('Registro guardado exitosamente!');
+        
+        // Limpiar formulario
+        clearForm();
+      });
+
+      // Función para limpiar el formulario
+      function clearForm() {
+        montoTotalInput.value = '';
+        subtotalInput.value = '';
+        ivaInput.value = '';
+        descripcionInput.value = '';
+        categoriaInput.value = '';
+        proveedorInput.value = '';
+        
+        // Mantener fecha actual
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('es-MX', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit'
+        });
+        fechaRegistroInput.value = formattedDate;
+        
+        // Actualizar preview
+        updatePreview();
+      }
+
+      // Inicializar preview
+      updatePreview();
+
+      // Back to Dashboard button
+      const backToDashboardBtn = document.getElementById('backToDashboard');
+      if (backToDashboardBtn) {
+        backToDashboardBtn.addEventListener('click', function() {
+          window.location.href = '/dashboard';
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
+
+

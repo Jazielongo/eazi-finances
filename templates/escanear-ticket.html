@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escanear Ticket - Eazi Finances</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/escanear-ticket-style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    {% include 'partials/navbar.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Title -->
+            <div class="page-title-container">
+                <div class="title-header">
+                    <button class="back-to-dashboard-btn" id="backToDashboard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <h1 class="page-title">ESCANEAR TICKET</h1>
+                </div>
+            </div>
+
+            <!-- Upload Container -->
+            <div class="upload-container">
+                <div class="upload-box" id="uploadBox">
+                    <div class="upload-content">
+                        <div class="upload-text">
+                            <p class="upload-instruction">Arrastra tu ticket aquí</p>
+                            <p class="upload-or">o</p>
+                        </div>
+                        <button class="upload-button" id="uploadButton">
+                            Examinar archivos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="fileInput" accept="image/*,.pdf" style="display: none;" multiple="false">
+
+            <!-- Processing Area (Hidden initially) -->
+            <div class="processing-area" id="processingArea" style="display: none;">
+                <div class="processing-content">
+                    <div class="processing-spinner"></div>
+                    <p class="processing-text">Procesando ticket...</p>
+                </div>
+            </div>
+
+            <!-- Results Area (Hidden initially) -->
+            <div class="results-area" id="resultsArea" style="display: none;">
+                <div class="results-content">
+                    <h3 class="results-title">Datos Extraídos del Ticket</h3>
+                    <div class="extracted-data">
+                        <div class="data-item">
+                            <label>Fecha:</label>
+                            <span id="extractedDate">-</span>
+                        </div>
+                        <div class="data-item">
+                            <label>Monto:</label>
+                            <span id="extractedAmount">-</span>
+                        </div>
+                        <div class="data-item">
+                            <label>Proveedor:</label>
+                            <span id="extractedProvider">-</span>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                        <button class="btn btn-primary" id="confirmBtn">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navbar functionality
+            const navbarBurger = document.querySelector('.navbar-burger');
+            const navbarMenu = document.getElementById('navbarMenu');
+            const userIcon = document.getElementById('userIcon');
+            const userDropdown = document.getElementById('userDropdown');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            // Toggle mobile menu
+            if (navbarBurger) {
+                navbarBurger.addEventListener('click', function() {
+                    navbarBurger.classList.toggle('is-active');
+                    navbarMenu.classList.toggle('is-active');
+                });
+            }
+
+            // Toggle user dropdown
+            if (userIcon && userDropdown) {
+                userIcon.addEventListener('click', function() {
+                    userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userIcon.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    fetch('/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            }
+            const uploadBox = document.getElementById('uploadBox');
+            const uploadButton = document.getElementById('uploadButton');
+            const fileInput = document.getElementById('fileInput');
+            const processingArea = document.getElementById('processingArea');
+            const resultsArea = document.getElementById('resultsArea');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            // Drag and drop functionality
+            uploadBox.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadBox.classList.add('dragover');
+            });
+
+            uploadBox.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadBox.classList.remove('dragover');
+            });
+
+            uploadBox.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadBox.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+
+            // Click to upload
+            uploadButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                console.log('Upload button clicked');
+                fileInput.click();
+            });
+
+            uploadBox.addEventListener('click', function(e) {
+                console.log('Upload box clicked, target:', e.target);
+                // Don't trigger if clicking on the button (it has its own handler)
+                if (!e.target.closest('.upload-button')) {
+                    console.log('Opening file dialog');
+                    fileInput.click();
+                }
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                console.log('File input changed, files:', e.target.files);
+                if (e.target.files.length > 0) {
+                    console.log('File selected:', e.target.files[0]);
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            // Handle file upload
+            function handleFileUpload(file) {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Por favor, selecciona un archivo de imagen (JPG, PNG) o PDF.');
+                    return;
+                }
+
+                // Validate file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('El archivo es demasiado grande. Máximo 10MB.');
+                    return;
+                }
+
+                // Show processing area
+                showProcessing();
+
+                // Simulate processing (replace with actual API call)
+                setTimeout(() => {
+                    showResults();
+                }, 3000);
+            }
+
+            function showProcessing() {
+                processingArea.style.display = 'flex';
+            }
+
+            function showResults() {
+                processingArea.style.display = 'none';
+                resultsArea.style.display = 'flex';
+                
+                // Simulate extracted data (replace with actual data)
+                document.getElementById('extractedDate').textContent = '15/10/2024';
+                document.getElementById('extractedAmount').textContent = '$1,250.00';
+                document.getElementById('extractedProvider').textContent = 'Supermercado ABC';
+            }
+
+            function resetUpload() {
+                processingArea.style.display = 'none';
+                resultsArea.style.display = 'none';
+                fileInput.value = '';
+            }
+
+            // Back to Dashboard button
+            const backToDashboardBtn = document.getElementById('backToDashboard');
+            backToDashboardBtn.addEventListener('click', function() {
+                window.location.href = '/dashboard';
+            });
+
+            // Event listeners
+            cancelBtn.addEventListener('click', resetUpload);
+            confirmBtn.addEventListener('click', function() {
+                // Here you would save the extracted data
+                alert('Ticket procesado exitosamente!');
+                resetUpload();
+            });
+        });
+    </script>
+</body>
+</html>

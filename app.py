@@ -51,8 +51,8 @@ def escanear_tickets():
     # Verificar si el usuario está logueado
     if 'usuario_id' not in session:
         return redirect('/')
-    # Por ahora redirigir al dashboard hasta que se cree el HTML
-    return redirect('/dashboard')
+    return render_template('escanear-ticket.html')
+
 
 @app.route('/mis-negocios')
 def mis_negocios():
