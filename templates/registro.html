@@ -687,8 +687,30 @@
           moneda: currentCurrency,
           descripcion: descripcionInput.value
         });
-        
-        alert('Registro guardado exitosamente!');
+
+        // Envío al backend (añade esto)
+        (async function(){
+          const form = document.getElementById('registroForm');
+          // asegurarse que los hidden estén actualizados (ya lo haces)
+          try {
+            const res = await fetch('/guardar_movimiento', {
+              method: 'POST',
+              credentials: 'same-origin',
+              body: new FormData(form)
+            });
+            const json = await res.json();
+            if (res.ok) {
+              alert(json.mensaje || 'Registro guardado exitosamente!');
+              updateBalance();
+              clearForm();
+            } else {
+              alert(json.error || 'Error al guardar');
+            }
+          } catch (err) {
+            console.error('Error al enviar formulario:', err);
+            alert('Error de conexión al guardar movimiento');
+          }
+        })();
         
         // Limpiar formulario
         clearForm();
@@ -731,5 +753,3 @@
 </body>
 
 </html>
-
-

@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, jsonify, session, redirect
+import re
 import pymysql
 pymysql.install_as_MySQLdb()
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
-import re
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'eazi_secret_key'  # cámbiala por algo aleatorio/seguro
@@ -11,7 +12,7 @@ app.secret_key = 'eazi_secret_key'  # cámbiala por algo aleatorio/seguro
 # Config MySQL (ajusta con tus credenciales)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'JazielSQL'             # tu pass
+app.config['MYSQL_PASSWORD'] = '12345'             # tu pass
 app.config['MYSQL_DB'] = 'eazi_finances'      # tu BDD
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 mysql = MySQL(app)
@@ -24,19 +25,56 @@ def index():
 
 @app.route('/dashboard')
 def dashboard():
-    # Verificar si el usuario está logueado
     if 'usuario_id' not in session:
         return redirect('/')
-    return render_template('dashboard.html')
+        
+    try:
+        cur = mysql.connection.cursor()
+        
+        # Calcular balance general sumando ingresos y restando egresos
+        cur.execute("""
+            SELECT 
+                COALESCE(SUM(CASE 
+                    WHEN tipo_movimiento = 'ingreso' THEN total 
+                    WHEN tipo_movimiento = 'egreso' THEN -total 
+                    ELSE 0 
+                END), 0) as balance
+            FROM movimiento 
+            WHERE id_negocio = 1
+        """)
+        result = cur.fetchone()
+        balance = float(result['balance']) if result and result['balance'] else 0.00
+        
+        cur.close()
+        
+        # Renderizar dashboard pasando el balance calculado
+        return render_template('dashboard.html', balance=balance)
+                             
+    except Exception as e:
+        print(f"Error en dashboard: {str(e)}")
+        return redirect('/')
 
 # ---------- Rutas para botones de acción ----------
 @app.route('/realizar-registro')
 def realizar_registro():
-    # Verificar si el usuario está logueado
     if 'usuario_id' not in session:
-        return redirect('/')
-    # Por ahora redirigir al dashboard hasta que se cree el HTML
-    return render_template('registro.html')
+        return redirect('/login')
+        
+    cur = mysql.connection.cursor()
+    
+    # Obtener categorías
+    cur.execute("SELECT categoria_id, nombre FROM categoria")
+    categorias = cur.fetchall()
+    
+    # Obtener proveedores
+    cur.execute("SELECT proveedor_id, nombre FROM proveedor")
+    proveedores = cur.fetchall()
+    
+    cur.close()
+    
+    return render_template('registro.html', 
+                         categorias=categorias,
+                         proveedores=proveedores)
 
 @app.route('/reportes')
 def reportes():
@@ -136,6 +174,86 @@ def login():
 def logout():
     session.clear()
     return jsonify(success=True, message='Sesión cerrada correctamente.', redirect='/'), 200
+
+# ---------- Movimientos ----------
+@app.route('/guardar_movimiento', methods=['POST'])
+def guardar_movimiento():
+    if 'usuario_id' not in session:
+        return jsonify({'error': 'No autorizado (inicia sesión)'}), 401
+
+    try:
+        cur = mysql.connection.cursor()
+        
+        # 1. Verificar/crear negocio por defecto
+        cur.execute("SELECT negocio_id FROM negocio WHERE negocio_id = 1")
+        if not cur.fetchone():
+            # Crear negocio por defecto
+            cur.execute("""
+                INSERT INTO negocio (negocio_id, nombre, giro, moneda_base) 
+                VALUES (1, 'Mi Negocio', 'General', 'MXN')
+            """)
+            # Asociar usuario al negocio
+            cur.execute("""
+                INSERT INTO usuario_negocio (id_usuario, id_negocio, rol)
+                VALUES (%s, 1, 'owner')
+            """, (session['usuario_id'],))
+            mysql.connection.commit()
+
+        # 2. Obtener datos del form
+        f = request.form
+        tipo = f.get('tipo_movimiento') or 'ingreso'
+        monto_total = f.get('monto_total') or f.get('montoTotal')
+        subtotal = f.get('subtotal')
+        iva = f.get('iva')
+        descripcion = f.get('descripcion') or ''
+        fecha_str = f.get('fecha_registro') or ''
+        
+        # 3. Parsear fecha
+        try:
+            fecha_obj = datetime.strptime(fecha_str, '%d/%m/%y')
+        except:
+            fecha_obj = datetime.now()
+
+        # 4. Parsear números
+        try:
+            total_n = float(monto_total) if monto_total else 0
+            subtotal_n = float(subtotal) if subtotal else None
+            iva_n = float(iva) if iva else None
+        except:
+            return jsonify({'error': 'Valores numéricos inválidos'}), 400
+
+        # 5. Insertar movimiento
+        cur.execute("""
+            INSERT INTO movimiento (
+                id_negocio, tipo_movimiento, descripcion, 
+                fecha_operacion, moneda, metodo_pago,
+                subtotal, iva, total, creado_por
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            1,  # id_negocio fijo = 1
+            tipo,
+            descripcion,
+            fecha_obj,
+            'MXN',
+            'efectivo',
+            subtotal_n,
+            iva_n,
+            total_n,
+            session['usuario_id']
+        ))
+        mysql.connection.commit()
+        movimiento_id = cur.lastrowid
+        cur.close()
+
+        return jsonify({
+            'mensaje': 'Movimiento guardado correctamente',
+            'movimiento_id': movimiento_id
+        }), 201
+
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Log del error
+        return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
