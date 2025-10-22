@@ -254,6 +254,82 @@ def guardar_movimiento():
         print(f"Error: {str(e)}")  # Log del error
         return jsonify({'error': str(e)}), 500
 
+@app.route('/edicion')
+def edicion():
+    if 'usuario_id' not in session:
+        return redirect('/')
+        
+    try:
+        cur = mysql.connection.cursor()
+        # Obtener todos los movimientos ordenados por fecha
+        cur.execute("""
+            SELECT 
+                movimiento_id,
+                tipo_movimiento,
+                descripcion,
+                DATE_FORMAT(fecha_operacion, '%d/%m/%y') as fecha,
+                total
+            FROM movimiento 
+            WHERE id_negocio = 1
+            ORDER BY fecha_operacion DESC, movimiento_id DESC
+        """)
+        movimientos = cur.fetchall()
+        cur.close()
+        
+        return render_template('edicion.html', movimientos=movimientos)
+    except Exception as e:
+        print(f"Error en edición: {str(e)}")
+        return redirect('/')
+
+@app.route('/actualizar_movimiento/<int:movimiento_id>', methods=['POST'])
+def actualizar_movimiento(movimiento_id):
+    if 'usuario_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+        
+    try:
+        data = request.get_json()
+        descripcion = data.get('descripcion', '').strip()
+        total = float(data.get('total', 0))
+        
+        if total <= 0:
+            return jsonify({'error': 'El monto debe ser mayor a 0'}), 400
+            
+        cur = mysql.connection.cursor()
+        # Actualizar movimiento
+        cur.execute("""
+            UPDATE movimiento 
+            SET descripcion = %s,
+                total = %s,
+                actualizado_en = CURRENT_TIMESTAMP
+            WHERE movimiento_id = %s AND id_negocio = 1
+        """, (descripcion, total, movimiento_id))
+        mysql.connection.commit()
+        cur.close()
+        
+        return jsonify({'mensaje': 'Movimiento actualizado correctamente'}), 200
+    except Exception as e:
+        print(f"Error actualizando movimiento: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/eliminar_movimiento/<int:movimiento_id>', methods=['POST'])
+def eliminar_movimiento(movimiento_id):
+    if 'usuario_id' not in session:
+        return jsonify({'error': 'No autorizado'}), 401
+        
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            DELETE FROM movimiento 
+            WHERE movimiento_id = %s AND id_negocio = 1
+        """, (movimiento_id,))
+        mysql.connection.commit()
+        cur.close()
+        
+        return jsonify({'mensaje': 'Movimiento eliminado correctamente'}), 200
+    except Exception as e:
+        print(f"Error eliminando movimiento: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
