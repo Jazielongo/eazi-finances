@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify, session, redirect
 import re
 import os
 import pymysql
+from PIL import Image
+import pytesseract
 import numpy as np
 from dateutil import parser
 from werkzeug.utils import secure_filename
