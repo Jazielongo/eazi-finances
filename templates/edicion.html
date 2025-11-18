@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,23 +8,24 @@
 
     <!-- Bulma -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-    
+
     <!-- CSS local -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
-    
+
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='img/eaziLogo500.png') }}" type="image/png" />
 
     <style>
         .section {
-            margin-top: 100px; /* Ajusta este valor según necesites */
+            margin-top: 100px;
+            /* Ajusta este valor según necesites */
             padding: 20px;
         }
-        
+
         .title {
             margin-bottom: 30px;
         }
-        
+
         /* Opcional: ajustar el contenedor principal */
         .container {
             max-width: 1200px;
@@ -32,13 +34,22 @@
         }
     </style>
 </head>
+
 <body>
     {% include 'partials/navbar.html' %}
 
     <section class="section">
         <div class="container">
-            <h1 class="title">Editar Movimientos</h1>
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <a class="button is-light" href="/dashboard">&larr; Volver al dashboard</a>
+                    </div>
+                </div>
+            </div>
             
+            <h1 class="title">Editar Movimientos</h1>
+
             <div class="tabs">
                 <ul>
                     <li class="is-active"><a onclick="mostrarTipo('todos')">Todos</a></li>
@@ -62,27 +73,29 @@
                     <tr data-tipo="{{ m.tipo_movimiento }}" id="mov-{{ m.movimiento_id }}">
                         <td>{{ m.fecha }}</td>
                         <td>
-                            <span class="tag {% if m.tipo_movimiento == 'ingreso' %}is-success{% else %}is-danger{% endif %}">
+                            <span
+                                class="tag {% if m.tipo_movimiento == 'ingreso' %}is-success{% else %}is-danger{% endif %}">
                                 {{ m.tipo_movimiento|capitalize }}
                             </span>
                         </td>
                         <td>
                             <span class="movimiento-valor">{{ m.descripcion }}</span>
-                            <input type="text" class="input is-small edit-input" style="display:none" 
-                                   value="{{ m.descripcion }}">
+                            <input type="text" class="input is-small edit-input" style="display:none"
+                                value="{{ m.descripcion }}">
                         </td>
                         <td>
                             <span class="movimiento-valor">{{ "${:,.2f}".format(m.total) }}</span>
-                            <input type="number" step="0.01" class="input is-small edit-input" style="display:none" 
-                                   value="{{ m.total }}">
+                            <input type="number" step="0.01" class="input is-small edit-input" style="display:none"
+                                value="{{ m.total }}">
                         </td>
                         <td>
                             <div class="buttons are-small">
-                                <button class="button is-info btn-editar" onclick="editarMovimiento({{ m.movimiento_id }})">
+                                <button class="button is-info btn-editar"
+                                    onclick="editarMovimiento({{ m.movimiento_id }})">
                                     Editar
                                 </button>
-                                <button class="button is-success btn-guardar" onclick="guardarMovimiento({{ m.movimiento_id }})" 
-                                        style="display:none">
+                                <button class="button is-success btn-guardar"
+                                    onclick="guardarMovimiento({{ m.movimiento_id }})" style="display:none">
                                     Guardar
                                 </button>
                                 <button class="button is-danger" onclick="eliminarMovimiento({{ m.movimiento_id }})">
@@ -106,7 +119,7 @@
                     tr.style.display = 'none';
                 }
             });
-            
+
             // Actualizar tabs
             document.querySelectorAll('.tabs li').forEach(li => {
                 li.classList.remove('is-active');
@@ -127,7 +140,7 @@
             const descripcionInput = row.querySelector('input[type="text"]');
             const totalInput = row.querySelector('input[type="number"]');
             const tipoMovimiento = row.querySelector('.tag').textContent.toLowerCase();
-            
+
             if (!descripcionInput || !totalInput) {
                 alert('Error: No se encontraron los campos de edición');
                 return;
@@ -164,7 +177,7 @@
                     // Actualizar valores mostrados
                     const descSpan = row.querySelector('.movimiento-valor:first-of-type');
                     const montoSpan = row.querySelector('.movimiento-valor:last-of-type');
-                    
+
                     if (descSpan && montoSpan) {
                         descSpan.textContent = descripcion;
                         montoSpan.textContent = `$${total.toFixed(2)}`;
@@ -204,7 +217,7 @@
                 if (response.ok) {
                     // Eliminar la fila visualmente
                     document.getElementById(`mov-${id}`).remove();
-                    
+
                     // Redirigir al dashboard para ver el balance actualizado
                     window.location.href = '/dashboard';
                 } else {
@@ -217,4 +230,5 @@
         }
     </script>
 </body>
+
 </html>

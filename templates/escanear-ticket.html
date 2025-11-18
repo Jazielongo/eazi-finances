@@ -61,17 +61,22 @@
                     <h3 class="results-title">Datos Extraídos del Ticket</h3>
                     <div class="extracted-data">
                         <div class="data-item">
-                            <label>Fecha:</label>
-                            <span id="extractedDate">-</span>
+                            <label for="extractedDateInput">Fecha:</label>
+                            <input id="extractedDateInput" name="fecha" type="text" placeholder="dd/mm/yyyy" value="" />
                         </div>
                         <div class="data-item">
-                            <label>Monto:</label>
-                            <span id="extractedAmount">-</span>
+                            <label for="extractedAmountInput">Monto:</label>
+                            <input id="extractedAmountInput" name="monto" type="text" placeholder="$0.00" value="" />
                         </div>
                         <div class="data-item">
-                            <label>Proveedor:</label>
-                            <span id="extractedProvider">-</span>
+                            <label for="extractedProviderInput">Proveedor:</label>
+                            <input id="extractedProviderInput" name="proveedor" type="text" placeholder="Proveedor" value="" />
                         </div>
+                    </div>
+                    <!-- Área para mostrar OCR crudo para depuración -->
+                    <div style="margin-top:1rem; text-align:left;">
+                        <button id="toggleOcr" class="btn btn-secondary" style="margin-bottom:0.5rem;">Mostrar OCR crudo</button>
+                        <pre id="ocrRaw" style="display:none; max-height:200px; overflow:auto; background:#fff; padding:0.75rem; border-radius:8px; border:1px solid #dfeedd;">-</pre>
                     </div>
                     <div class="results-actions">
                         <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
@@ -190,9 +195,9 @@
             // Handle file upload
             function handleFileUpload(file) {
                 // Validate file type
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
                 if (!allowedTypes.includes(file.type)) {
-                    alert('Por favor, selecciona un archivo de imagen (JPG, PNG) o PDF.');
+                    alert('Por favor, selecciona un archivo de imagen (JPG, PNG).');
                     return;
                 }
 
@@ -205,30 +210,61 @@
                 // Show processing area
                 showProcessing();
 
-                // Simulate processing (replace with actual API call)
-                setTimeout(() => {
-                    showResults();
-                }, 3000);
+                // Crear FormData y enviar al servidor
+                const formData = new FormData();
+                formData.append('ticket', file);
+
+                fetch('/procesar-ticket', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error al procesar el ticket: ' + data.error);
+                        resetUpload();
+                        return;
+                    }
+                    showResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al procesar el ticket');
+                    resetUpload();
+                });
             }
 
             function showProcessing() {
                 processingArea.style.display = 'flex';
             }
 
-            function showResults() {
+            function showResults(data) {
                 processingArea.style.display = 'none';
                 resultsArea.style.display = 'flex';
                 
-                // Simulate extracted data (replace with actual data)
-                document.getElementById('extractedDate').textContent = '15/10/2024';
-                document.getElementById('extractedAmount').textContent = '$1,250.00';
-                document.getElementById('extractedProvider').textContent = 'Supermercado ABC';
+                // Mostrar los datos reales extraídos del ticket en inputs editables
+                const dateInput = document.getElementById('extractedDateInput');
+                const amountInput = document.getElementById('extractedAmountInput');
+                const providerInput = document.getElementById('extractedProviderInput');
+                if (dateInput) dateInput.value = data.fecha || '';
+                if (amountInput) amountInput.value = data.total ? (Number(data.total).toFixed(2)) : '';
+                if (providerInput) providerInput.value = data.proveedor || '';
+                // Llenar OCR crudo para depuración
+                const ocrEl = document.getElementById('ocrRaw');
+                if (ocrEl) {
+                    ocrEl.textContent = data.texto_completo || '';
+                }
+                // Guardar filename devuelto por el servidor para usar al confirmar
+                window._scannedTicketFilename = data.filename || null;
             }
 
             function resetUpload() {
                 processingArea.style.display = 'none';
                 resultsArea.style.display = 'none';
                 fileInput.value = '';
+                // ocultar OCR crudo al resetear
+                const ocrEl = document.getElementById('ocrRaw');
+                if (ocrEl) { ocrEl.style.display = 'none'; }
             }
 
             // Back to Dashboard button
@@ -240,10 +276,60 @@
             // Event listeners
             cancelBtn.addEventListener('click', resetUpload);
             confirmBtn.addEventListener('click', function() {
-                // Here you would save the extracted data
-                alert('Ticket procesado exitosamente!');
-                resetUpload();
+                // Tomar valores editables
+                const fecha = document.getElementById('extractedDateInput').value.trim();
+                const total = document.getElementById('extractedAmountInput').value.trim();
+                const proveedor = document.getElementById('extractedProviderInput').value.trim();
+
+                if (!total || !fecha) {
+                    alert('Debes proporcionar al menos Fecha y Monto.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('tipo_movimiento', 'egreso');
+                // Enviar monto como número simple (sin $)
+                formData.append('monto_total', total.replace(/[^0-9.,]/g, ''));
+                formData.append('fecha_registro', fecha);
+                formData.append('descripcion', `Compra en ${proveedor}`);
+                // Adjuntar filename del ticket escaneado para que se guarde en mis-tickets
+                if (window._scannedTicketFilename) {
+                    formData.append('ticket_filename', window._scannedTicketFilename);
+                }
+
+                fetch('/guardar_movimiento', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mensaje) {
+                        alert('Ticket guardado exitosamente');
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert('Error al guardar el ticket: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al guardar el ticket');
+                });
             });
+            // Toggle OCR crudo
+            const toggleOcrBtn = document.getElementById('toggleOcr');
+            if (toggleOcrBtn) {
+                toggleOcrBtn.addEventListener('click', function() {
+                    const ocrEl = document.getElementById('ocrRaw');
+                    if (!ocrEl) return;
+                    if (ocrEl.style.display === 'none' || ocrEl.style.display === '') {
+                        ocrEl.style.display = 'block';
+                        toggleOcrBtn.textContent = 'Ocultar OCR crudo';
+                    } else {
+                        ocrEl.style.display = 'none';
+                        toggleOcrBtn.textContent = 'Mostrar OCR crudo';
+                    }
+                });
+            }
         });
     </script>
 </body>

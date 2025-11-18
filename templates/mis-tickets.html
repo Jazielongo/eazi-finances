@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Tickets - Eazi Finances</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <style>
+        .ticket-edit-form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .ticket-edit-form .field:not(:last-child) {
+            margin-bottom: 0.75rem;
+        }
+        .ticket-edit-form .label {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        .ticket-content {
+            margin-bottom: 1rem;
+        }
+        .buttons {
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Modal para ver imagen en grande -->
+    <div class="modal" id="imageModal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <p class="image">
+                <img src="" id="modalImage" style="max-height: 90vh; width: auto;">
+            </p>
+        </div>
+        <button class="modal-close is-large" aria-label="close"></button>
+    </div>
+    {% include 'partials/navbar.html' %}
+
+    <section class="section page-with-fixed-navbar">
+        <div class="container">
+            <h1 class="title">MIS TICKETS</h1>
+
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <a class="button is-light" href="/dashboard">&larr; Volver al dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns is-multiline">
+                {% if items and items|length > 0 %}
+                    {% for it in items %}
+                    <div class="column is-3">
+                        <div class="card">
+                            <div class="card-image">
+                                <figure class="image is-4by3">
+                                    <img src="{{ url_for('static', filename='uploads/tickets/' + it.filename) }}" 
+                                         alt="ticket-{{ loop.index }}"
+                                         class="js-zoom-image"
+                                         style="cursor: pointer;"
+                                         title="Clic para ampliar">
+                                </figure>
+                            </div>
+                            <div class="card-content ticket-card-content">
+                                <div class="content ticket-content">
+                                    <div class="ticket-info">
+                                        <p><strong class="js-proveedor">{{ it.proveedor or "Sin proveedor" }}</strong></p>
+                                        <p>Fecha: <span class="js-fecha">{{ it.fecha or '—' }}</span></p>
+                                        <p>Total: <span class="js-total">{{ it.total if it.total is not none else '—' }}</span></p>
+                                    </div>
+                                    <div class="ticket-edit-form" style="display: none;">
+                                        <div class="field">
+                                            <label class="label">Proveedor</label>
+                                            <input type="text" class="input is-small js-edit-proveedor" value="{{ it.proveedor or '' }}">
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">Fecha</label>
+                                            <input type="text" class="input is-small js-edit-fecha" value="{{ it.fecha or '' }}" placeholder="DD/MM/YYYY">
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">Total</label>
+                                            <input type="text" class="input is-small js-edit-total" value="{{ it.total or '' }}">
+                                        </div>
+                                        <div class="field is-grouped">
+                                            <div class="control">
+                                                <button class="button is-primary is-small js-save">Guardar</button>
+                                            </div>
+                                            <div class="control">
+                                                <button class="button is-light is-small js-cancel">Cancelar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="buttons is-centered">
+                                        <button class="button is-info is-small js-edit" data-fname="{{ it.filename }}">Editar</button>
+                                        <button class="button is-danger is-small js-delete" data-fname="{{ it.filename }}">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="column">
+                    <p>No hay tickets guardados aún.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Funcionalidad para ver imagen en grande
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            // Abrir modal al hacer clic en una imagen
+            document.querySelectorAll('.js-zoom-image').forEach(img => {
+                img.addEventListener('click', function() {
+                    modalImg.src = this.src;
+                    modal.classList.add('is-active');
+                });
+            });
+            
+            // Cerrar modal
+            modal.querySelector('.modal-background').addEventListener('click', () => {
+                modal.classList.remove('is-active');
+            });
+            modal.querySelector('.modal-close').addEventListener('click', () => {
+                modal.classList.remove('is-active');
+            });
+            // Cerrar modal con tecla ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('is-active')) {
+                    modal.classList.remove('is-active');
+                }
+            });
+            // Función para eliminar tickets
+            document.querySelectorAll('.js-delete').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const fname = this.dataset.fname;
+                    if (!confirm('¿Eliminar ' + fname + '?')) return;
+
+                    fetch('/mis-tickets/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename: fname })
+                    }).then(r => r.json()).then(j => {
+                        if (j.mensaje) {
+                            // recargar la página para actualizar la lista
+                            window.location.reload();
+                        } else {
+                            alert(j.error || 'Ocurrió un error');
+                        }
+                    }).catch(() => alert('Error de conexión'));
+                });
+            });
+
+            // Funcionalidad de edición
+            document.querySelectorAll('.js-edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.card-content');
+                    const fname = this.dataset.fname;
+                    
+                    // Mostrar formulario, ocultar info
+                    card.querySelector('.ticket-info').style.display = 'none';
+                    card.querySelector('.ticket-edit-form').style.display = 'block';
+                    card.querySelector('.buttons').style.display = 'none';
+                });
+            });
+
+            // Botón cancelar edición
+            document.querySelectorAll('.js-cancel').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const card = this.closest('.card-content');
+                    
+                    // Ocultar formulario, mostrar info
+                    card.querySelector('.ticket-info').style.display = 'block';
+                    card.querySelector('.ticket-edit-form').style.display = 'none';
+                    card.querySelector('.buttons').style.display = 'block';
+                });
+            });
+
+            // Botón guardar cambios
+            document.querySelectorAll('.js-save').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const card = this.closest('.card-content');
+                    const filename = card.querySelector('.buttons .js-edit').dataset.fname;
+                    
+                    const data = {
+                        filename: filename,
+                        proveedor: card.querySelector('.js-edit-proveedor').value.trim(),
+                        fecha: card.querySelector('.js-edit-fecha').value.trim(),
+                        total: card.querySelector('.js-edit-total').value.trim()
+                    };
+
+                    try {
+                        const response = await fetch('/mis-tickets/update', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            // Actualizar vista
+                            card.querySelector('.js-proveedor').textContent = data.proveedor || 'Sin proveedor';
+                            card.querySelector('.js-fecha').textContent = data.fecha || '—';
+                            card.querySelector('.js-total').textContent = data.total || '—';
+                            
+                            // Ocultar formulario, mostrar info
+                            card.querySelector('.ticket-info').style.display = 'block';
+                            card.querySelector('.ticket-edit-form').style.display = 'none';
+                            card.querySelector('.buttons').style.display = 'block';
+                        } else {
+                            alert(result.error || 'Error al actualizar');
+                        }
+                    } catch (error) {
+                        alert('Error de conexión');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

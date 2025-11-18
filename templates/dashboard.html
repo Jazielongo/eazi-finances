@@ -85,9 +85,9 @@
                 </div>
 
                 <div class="action-button">
-                    <span class="action-label">MIS NEGOCIOS</span>
+                    <span class="action-label">MIS TICKETS</span>
                     <div class="action-icon">
-                        <img src="{{ url_for('static', filename='img/tienda.png') }}" alt="Mis Negocios"
+                        <img src="{{ url_for('static', filename='img/tienda.png') }}" alt="Mis Tickets"
                             class="action-icon-img" />
                     </div>
                 </div>
@@ -208,20 +208,23 @@
                             </div>
                         </div>
                         <div class="movement-content">
-                            <div class="movement-item">
-                                <div class="movement-info">
-                                    <div class="movement-description">Venta 1 pastel</div>
-                                    <div class="movement-date">09/10/25</div>
+                            {% if ingresos %}
+                                {% for ingreso in ingresos %}
+                                <div class="movement-item">
+                                    <div class="movement-info">
+                                        <div class="movement-description">{{ ingreso.descripcion }}</div>
+                                        <div class="movement-date">{{ ingreso.fecha }}</div>
+                                    </div>
+                                    <div class="movement-amount positive">+${{ "{:,.2f}".format(ingreso.total) }}</div>
                                 </div>
-                                <div class="movement-amount positive">+$550.50</div>
-                            </div>
-                            <div class="movement-item">
-                                <div class="movement-info">
-                                    <div class="movement-description">Venta 5 pasteles</div>
-                                    <div class="movement-date">10/10/25</div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="movement-item">
+                                    <div class="movement-info">
+                                        <div class="movement-description">No hay ingresos registrados</div>
+                                    </div>
                                 </div>
-                                <div class="movement-amount positive">+$10,000.00</div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -337,20 +340,23 @@
                             </div>
                         </div>
                         <div class="movement-content">
-                            <div class="movement-item">
-                                <div class="movement-info">
-                                    <div class="movement-description">Compra MP</div>
-                                    <div class="movement-date">09/10/25</div>
+                            {% if egresos %}
+                                {% for egreso in egresos %}
+                                <div class="movement-item">
+                                    <div class="movement-info">
+                                        <div class="movement-description">{{ egreso.descripcion }}</div>
+                                        <div class="movement-date">{{ egreso.fecha }}</div>
+                                    </div>
+                                    <div class="movement-amount negative">-${{ "{:,.2f}".format(egreso.total) }}</div>
                                 </div>
-                                <div class="movement-amount negative">-$1,550.50</div>
-                            </div>
-                            <div class="movement-item">
-                                <div class="movement-info">
-                                    <div class="movement-description">Renta local</div>
-                                    <div class="movement-date">10/10/25</div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="movement-item">
+                                    <div class="movement-info">
+                                        <div class="movement-description">No hay egresos registrados</div>
+                                    </div>
                                 </div>
-                                <div class="movement-amount negative">-$8,000.00</div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -675,7 +681,7 @@
                             '/realizar-registro',
                             '/edicion',
                             '/escanear-tickets',
-                            '/mis-negocios'
+                            '/mis-tickets'
                         ];
 
                         if (routes[index]) {

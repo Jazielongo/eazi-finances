@@ -635,6 +635,18 @@ body {
 }
 
 /* Estilos específicos para el modal del equipo */
+
+/* Ajustes para páginas con navbar fija para que el título no quede oculto */
+.page-with-fixed-navbar {
+  padding-top: clamp(5rem, 6vw, 7rem) !important;
+}
+
+/* Estilos específicos para tarjetas de tickets (texto en negro para legibilidad) */
+.ticket-card-content, .ticket-card-content .content, .ticket-content {
+  color: #000 !important;
+}
+
+
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
